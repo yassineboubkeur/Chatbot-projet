@@ -8,6 +8,12 @@ import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
 import Dashboard from './pages/Dashboard'
 import Clients from './pages/Clients'
+import Services from './pages/services/Services'
+import AddService from './pages/services/Add_service'
+import UpdateService from './pages/services/Update_service'
+import Products from './pages/products/Products'
+import UpdateProduct from './pages/products/Update_product'
+import AddProduct from './pages/products/Add_product'
 
 export default function App() {
   return (
@@ -19,6 +25,12 @@ export default function App() {
         <Route path="/reset" element={<ResetPassword />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/clients" element={<Clients />} /> 
+        <Route path="/services" element={<Services />} />
+        <Route path="/services/add" element={<AddService />} /> 
+        <Route path="/update-service" element={<UpdateService />} /> 
+        <Route path="/products" element={<Products />} />
+        <Route path="/products/add" element={<AddProduct />} /> 
+        <Route path="/update-product" element={<UpdateProduct />} /> 
         <Route path="/" element={<Login />} />
       </Route>
     </Routes>

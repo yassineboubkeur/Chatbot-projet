@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { FaTachometerAlt, FaUserFriends, FaUsers, FaCog } from 'react-icons/fa'
+import { FaTachometerAlt, FaUserFriends, FaUsers, FaCog, FaServicestack, FaBox } from 'react-icons/fa'
 import '../components/css/Sidebar.css'
 
 export default function Sidebar() {
@@ -10,6 +10,8 @@ export default function Sidebar() {
     { name: 'Dashboard', path: '/dashboard', icon: <FaTachometerAlt /> },
     { name: 'Clients', path: '/clients', icon: <FaUserFriends /> },
     { name: 'Team', path: '/team', icon: <FaUsers /> },
+    { name: 'Services', path: '/services', icon: <FaServicestack /> }, 
+    { name: 'Products', path: '/products', icon: <FaBox /> },
     { name: 'Settings', path: '/settings', icon: <FaCog /> },
   ]
 
