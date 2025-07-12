@@ -8,59 +8,64 @@ import "react-toastify/dist/ReactToastify.css";
 export default function AddService() {
   const navigate = useNavigate();
   const user = useAuthStore(state => state.user);
-  const token = useAuthStore(state => state.token); // نفترض access_token موجود في user
-  const apiUrl = import.meta.env.VITE_API_URL; // رابط API من ملف env
-
-  useEffect(() => {
-    if (!user) {
-      navigate("/login");
-    }
-  }, [user, navigate]);
+  const token = useAuthStore(state => state.token);
+  const isLoadingAuth = useAuthStore(state => state.isLoadingAuth);
+  const loadAuthFromStorage = useAuthStore(state => state.loadAuthFromStorage);
+  const apiUrl = import.meta.env.VITE_API_URL;
 
   const [newService, setNewService] = useState({
     name: "",
     description: "",
     price: "",
-    periode: "",   // ضروري ف API   
+    periode: "", // ضروري ف API
   });
+
+  // تحميل بيانات المصادقة عند البداية
+  useEffect(() => {
+    loadAuthFromStorage();
+  }, [loadAuthFromStorage]);
+
+  // الانتظار حتى يكتمل تحميل المصادقة ثم التحقق من وجود user و token
+  useEffect(() => {
+    if (isLoadingAuth) return;
+
+    if (!user || !token) {
+      navigate("/login");
+    }
+  }, [isLoadingAuth, user, token, navigate]);
 
   const handleAddService = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  console.log("User:", user);
-  console.log("Token:", token);
+    try {
+      const response = await fetch(`${apiUrl}/services/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          ...newService,
+          price: Number(newService.price),
+        }),
+      });
 
-  console.log("Sending data:", {
-    ...newService,
-    price: Number(newService.price),
-  });
+      const result = await response.json();
 
-  try {
-    const response = await fetch(`${apiUrl}/services/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        ...newService,
-        price: Number(newService.price),
-      }),
-    });
-
-    const result = await response.json();
-
-    if (response.ok) {
-      toast.success("Service added successfully!");
-      navigate("/dashboard/services");
-    } else {
-      toast.error(result.message || "Failed to add service");
+      if (response.ok) {
+        toast.success("Service added successfully!");
+        navigate("/dashboard/services");
+      } else {
+        toast.error(result.message || "Failed to add service");
+      }
+    } catch (error) {
+      toast.error("Error: " + error.message);
     }
-  } catch (error) {
-    toast.error("Error: " + error.message);
-  }
-};
+  };
 
+  if (isLoadingAuth) {
+    return <div>Loading authentication...</div>;
+  }
 
   return (
     <div className="container mt-4">

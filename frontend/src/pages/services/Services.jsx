@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import Sidebar from "../../layouts/Sidebar";
 import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../store/useAuthStore";
@@ -9,11 +8,19 @@ export default function Services() {
   const navigate = useNavigate();
   const user = useAuthStore(state => state.user);
   const token = useAuthStore(state => state.token);
+  const isLoadingAuth = useAuthStore(state => state.isLoadingAuth);
+  const loadAuthFromStorage = useAuthStore(state => state.loadAuthFromStorage);
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const apiUrl = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
+    loadAuthFromStorage();
+  }, [loadAuthFromStorage]);
+
+  useEffect(() => {
+    if (isLoadingAuth) return;
+
     if (!user || !token) {
       navigate("/login");
       return;
@@ -35,7 +42,7 @@ export default function Services() {
         }
 
         const data = await response.json();
-        setServices(data.data); // حسب JSON ديال API ديالك
+        setServices(data.data);
       } catch (error) {
         console.error("Fetch services error:", error);
         toast.error("Error loading services. Please try again later.");
@@ -45,36 +52,36 @@ export default function Services() {
     };
 
     fetchServices();
-  }, [apiUrl, navigate, user, token]);
+  }, [apiUrl, navigate, user, token, isLoadingAuth]);
 
-  const handleUpdate = (id) => {
-    navigate(`/services/edit/${id}`);
-    // navigate(`/services/update/${id}`);
-  };
+  const handleUpdate = (id) => navigate(`/services/edit/${id}`);
 
   const handleDelete = async (id) => {
-  try {
-    const response = await fetch(`${apiUrl}/services/${id}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/json"
+    try {
+      const response = await fetch(`${apiUrl}/services/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json"
+        }
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        toast.success(result.message || "Service deleted successfully!");
+        setServices(services.filter(service => service.id !== id));
+      } else {
+        toast.error(result.message || "Failed to delete service.");
       }
-    });
-
-    const result = await response.json();
-    if (response.ok) {
-      toast.success(result.message || "Service deleted successfully!");
-      setServices(services.filter(service => service.id !== id));
-    } else {
-      toast.error(result.message || "Failed to delete service.");
+    } catch (error) {
+      console.error("Delete service error:", error);
+      toast.error("Error deleting service. Please try again later.");
     }
-  } catch (error) {
-    console.error("Delete service error:", error);
-    toast.error("Error deleting service. Please try again later.");
-  }
-};
+  };
 
+  if (isLoadingAuth) {
+    return <div>Loading authentication...</div>;
+  }
 
   return (
     <div className="container mt-4">
@@ -108,7 +115,6 @@ export default function Services() {
                 {services.length > 0 ? (
                   services.map((service) => (
                     <tr key={service.id}>
-                      
                       <td>{service.name}</td>
                       <td>{service.description}</td>
                       <td>${service.price}</td>

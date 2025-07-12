@@ -9,12 +9,8 @@ export default function AddProduct() {
   const navigate = useNavigate();
   const user = useAuthStore(state => state.user);
   const token = useAuthStore(state => state.token);
-
-  useEffect(() => {
-    if (!user) {
-      navigate("/login");
-    }
-  }, [user, navigate]);
+  const isLoadingAuth = useAuthStore(state => state.isLoadingAuth);
+  const loadAuthFromStorage = useAuthStore(state => state.loadAuthFromStorage);
 
   const [newProduct, setNewProduct] = useState({
     name: "",
@@ -23,12 +19,22 @@ export default function AddProduct() {
     unit: "",
   });
 
+  // نحمّل حالة المصادقة من التخزين المحلي
+  useEffect(() => {
+    loadAuthFromStorage();
+  }, [loadAuthFromStorage]);
+
+  // ننتظر حتى تكتمل عملية تحميل المصادقة قبل التحقق
+  useEffect(() => {
+    if (isLoadingAuth) return;
+
+    if (!user || !token) {
+      navigate("/login");
+    }
+  }, [isLoadingAuth, user, token, navigate]);
+
   const handleAddProduct = async (e) => {
     e.preventDefault();
-
-    console.log("User:", user);
-    console.log("Token:", token);
-    console.log("Product to add:", newProduct);
 
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/products/`, {
@@ -51,6 +57,11 @@ export default function AddProduct() {
       toast.error("Error: " + error.message);
     }
   };
+
+  // إذا كانت المصادقة تشتغل، نعرض رسالة انتظار
+  if (isLoadingAuth) {
+    return <div>Loading authentication...</div>;
+  }
 
   return (
     <div className="container mt-4">

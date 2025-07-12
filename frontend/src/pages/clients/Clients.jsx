@@ -1,33 +1,48 @@
 import React, { useState, useEffect } from "react";
-import Sidebar from "../../layouts/Sidebar";
-import { toast, ToastContainer } from "react-toastify";
-import { useAuthStore } from "../../store/useAuthStore"; // ✅
-import { useNavigate } from "react-router-dom"; // ✅
+import { ToastContainer, toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../../store/useAuthStore";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function Clients() {
+  const navigate = useNavigate();
+  const user = useAuthStore(state => state.user);
+  const token = useAuthStore(state => state.token);
+  const isLoadingAuth = useAuthStore(state => state.isLoadingAuth);
+  const loadAuthFromStorage = useAuthStore(state => state.loadAuthFromStorage);
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
   const apiUrl = import.meta.env.VITE_API_URL;
 
-  const user = useAuthStore(state => state.user); // ✅
-  const navigate = useNavigate(); // ✅
+  useEffect(() => {
+    loadAuthFromStorage();
+  }, [loadAuthFromStorage]);
 
   useEffect(() => {
-    if (!user) {
+    if (isLoadingAuth) return;
+
+    if (!user || !token) {
       navigate("/login");
+      return;
     }
-  }, [user, navigate]);
 
-  useEffect(() => {
     const fetchClients = async () => {
       try {
-        const response = await fetch(`${apiUrl}/clients`);
+        const response = await fetch(`${apiUrl}/clients/`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          }
+        });
+
         if (!response.ok) {
+          const text = await response.text();
+          console.error("Response not OK:", text);
           throw new Error("Failed to fetch clients.");
         }
+
         const data = await response.json();
-        setClients(data);
+        setClients(data.data);
       } catch (error) {
         console.error("Fetch clients error:", error);
         toast.error("Error loading clients. Please try again later.");
@@ -37,71 +52,101 @@ export default function Clients() {
     };
 
     fetchClients();
-  }, [apiUrl]);
+  }, [apiUrl, navigate, user, token, isLoadingAuth]);
 
-  const handleUpdate = (client) => {
-    toast.info(`Update feature for ${client.username} is not implemented yet.`);
+  const handleUpdate = (id) => {
+    navigate(`/clients/edit/${id}`);
   };
 
-  const handleDelete = (client) => {
-    setClients(clients.filter((c) => c.username !== client.username));
-    toast.success(`${client.username} deleted successfully.`);
+  const handleDelete = async (id) => {
+    try {
+      const response = await fetch(`${apiUrl}/clients/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json"
+        }
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        toast.success(result.message || "Client deleted successfully!");
+        setClients(clients.filter(client => client.id !== id));
+      } else {
+        toast.error(result.message || "Failed to delete client.");
+      }
+    } catch (error) {
+      console.error("Delete client error:", error);
+      toast.error("Error deleting client. Please try again later.");
+    }
   };
+
+  if (isLoadingAuth) {
+    return <div>Loading authentication...</div>;
+  }
 
   return (
-    <>
-      <ToastContainer position="top-right" autoClose={3000} />
-      <div className="container mt-4">
-        <div className="row">
-          <div className="col-md-9">
-            <h3 className="mb-4">Clients List</h3>
-            {loading ? (
-              <div>Loading clients...</div>
-            ) : (
-              <table className="table table-striped">
-                <thead>
-                  <tr>
-                    <th>Username</th>
-                    <th>Email</th>
-                    <th>Phone Number</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {clients.map((client, index) => (
-                    <tr key={index}>
+    <div className="container mt-4">
+      <ToastContainer />
+      <div className="row">
+        <div className="col-md-9">
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <h3>Clients List</h3>
+            <button
+              className="btn btn-success"
+              onClick={() => navigate("/dashboard/clients/add")}
+            >
+              Add New Client
+            </button>
+          </div>
+
+          {loading ? (
+            <div>Loading clients...</div>
+          ) : (
+            <table className="table table-bordered align-middle">
+              <thead className="table-light">
+                <tr>
+                  <th>Username</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {clients.length > 0 ? (
+                  clients.map((client) => (
+                    <tr key={client.id}>
                       <td>{client.username}</td>
                       <td>{client.email}</td>
                       <td>{client.phone}</td>
                       <td>
                         <button
-                          className="btn btn-sm btn-warning me-2"
-                          onClick={() => handleUpdate(client)}
+                          className="btn btn-sm btn-primary me-2"
+                          onClick={() => handleUpdate(client.id)}
                         >
                           Update
                         </button>
                         <button
                           className="btn btn-sm btn-danger"
-                          onClick={() => handleDelete(client)}
+                          onClick={() => handleDelete(client.id)}
                         >
                           Delete
                         </button>
                       </td>
                     </tr>
-                  ))}
-                  {clients.length === 0 && (
-                    <tr>
-                      <td colSpan="4" className="text-center">
-                        No clients found.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            )}
-          </div>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="4" className="text-center">
+                      No clients found.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
-    </>
+    </div>
   );
 }

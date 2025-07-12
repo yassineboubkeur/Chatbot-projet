@@ -1,13 +1,12 @@
+// src/pages/Profile.jsx
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 
-
 export default function Profile() {
   const user = useAuthStore((state) => state.user);
-  const loadAuthFromStorage = useAuthStore(
-    (state) => state.loadAuthFromStorage
-  );
+  const isLoadingAuth = useAuthStore((state) => state.isLoadingAuth);
+  const loadAuthFromStorage = useAuthStore((state) => state.loadAuthFromStorage);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -15,13 +14,17 @@ export default function Profile() {
   }, [loadAuthFromStorage]);
 
   useEffect(() => {
-    if (!user) {
+    if (!isLoadingAuth && !user) {
       navigate("/login");
     }
-  }, [user, navigate]);
+  }, [user, isLoadingAuth, navigate]);
+
+  if (isLoadingAuth) {
+    return <p>Loading...</p>;
+  }
 
   if (!user) {
-    return <p>Loading...</p>;
+    return null; // أو يمكن ترجع <Navigate to="/login" replace /> 
   }
 
   return (
