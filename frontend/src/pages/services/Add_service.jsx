@@ -52,7 +52,7 @@ export default function AddService() {
 
     if (response.ok) {
       toast.success("Service added successfully!");
-      navigate("/services");
+      navigate("/dashboard/services");
     } else {
       toast.error(result.message || "Failed to add service");
     }
@@ -66,9 +66,6 @@ export default function AddService() {
     <div className="container mt-4">
       <ToastContainer />
       <div className="row">
-        <div className="col-md-3">
-          <Sidebar />
-        </div>
         <div className="col-md-9">
           <h3 className="mb-4">Add New Service</h3>
           <form onSubmit={handleAddService}>

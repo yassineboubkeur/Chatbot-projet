@@ -28,7 +28,7 @@ export default function Login() {
         const data = await response.json();
         login(data.user, data.access_token);
         toast.success("Login successful!");
-        navigate("/dashboard");
+        navigate("/dashboard/profile");
       }
     } catch (error) {
       console.error("Login error:", error);

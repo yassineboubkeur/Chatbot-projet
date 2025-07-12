@@ -43,7 +43,7 @@ export default function AddProduct() {
       const result = await response.json();
       if (response.ok) {
         toast.success("Product added successfully!");
-        navigate("/products");
+        navigate("/dashboard/products");
       } else {
         toast.error(result.message || "Failed to add product");
       }
@@ -56,9 +56,6 @@ export default function AddProduct() {
     <div className="container mt-4">
       <ToastContainer />
       <div className="row">
-        <div className="col-md-3">
-          <Sidebar />
-        </div>
         <div className="col-md-9">
           <h3 className="mb-4">Add New Product</h3>
           <form onSubmit={handleAddProduct}>

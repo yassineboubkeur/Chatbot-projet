@@ -8,11 +8,11 @@ export default function Sidebar() {
 
   const menuItems = [
     { name: 'Dashboard', path: '/dashboard', icon: <FaTachometerAlt /> },
-    { name: 'Clients', path: '/clients', icon: <FaUserFriends /> },
-    { name: 'Team', path: '/team', icon: <FaUsers /> },
-    { name: 'Services', path: '/services', icon: <FaServicestack /> }, 
-    { name: 'Products', path: '/products', icon: <FaBox /> },
-    { name: 'Settings', path: '/settings', icon: <FaCog /> },
+    { name: 'Clients', path: '/dashboard/clients', icon: <FaUserFriends /> },
+    { name: 'Team', path: '/dashboard/team', icon: <FaUsers /> },
+    { name: 'Services', path: '/dashboard/services', icon: <FaServicestack /> }, 
+    { name: 'Products', path: '/dashboard/products', icon: <FaBox /> },
+    { name: 'Settings', path: '/dashboard/settings', icon: <FaCog /> },
   ]
 
   return (

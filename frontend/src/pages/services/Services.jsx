@@ -80,13 +80,12 @@ export default function Services() {
     <div className="container mt-4">
       <ToastContainer />
       <div className="row">
-        <div className="col-md-3"><Sidebar /></div>
         <div className="col-md-9">
           <div className="d-flex justify-content-between align-items-center mb-4">
             <h3>Services List</h3>
             <button
               className="btn btn-success"
-              onClick={() => navigate("/services/add")}
+              onClick={() => navigate("/dashboard/services/add")}
             >
               Add New Service
             </button>

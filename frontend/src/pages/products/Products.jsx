@@ -81,15 +81,12 @@ export default function Products() {
     <div className="container mt-4">
       <ToastContainer />
       <div className="row">
-        <div className="col-md-3">
-          <Sidebar />
-        </div>
         <div className="col-md-9">
           <div className="d-flex justify-content-between align-items-center mb-4">
             <h3>Products List</h3>
             <button
               className="btn btn-success"
-              onClick={() => navigate("/products/add")}
+              onClick={() => navigate("/dashboard/products/add")}
             >
               Add New Product
             </button>

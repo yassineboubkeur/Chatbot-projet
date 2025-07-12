@@ -55,9 +55,6 @@ export default function UpdateProduct() {
     <div className="container mt-4">
       <ToastContainer />
       <div className="row">
-        <div className="col-md-3">
-          <Sidebar />
-        </div>
         <div className="col-md-9">
           <h3 className="mb-4">Update Product</h3>
           <form onSubmit={handleUpdateProduct}>
