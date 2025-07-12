@@ -53,10 +53,29 @@ export default function Products() {
     // navigate(`/products/update/${id}`);
   };
 
-  const handleDelete = (id) => {
-    setProducts(products.filter(product => product.id !== id));
-    toast.success(`Product deleted successfully!`);
-  };
+  const handleDelete = async (id) => {
+  try {
+    const response = await fetch(`${apiUrl}/products/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json"
+      }
+    });
+
+    const result = await response.json();
+    if (response.ok) {
+      toast.success(result.message || "Product deleted successfully!");
+      setProducts(products.filter(product => product.id !== id));
+    } else {
+      toast.error(result.message || "Failed to delete product.");
+    }
+  } catch (error) {
+    console.error("Delete product error:", error);
+    toast.error("Error deleting product. Please try again later.");
+  }
+};
+
 
   return (
     <div className="container mt-4">
@@ -81,7 +100,6 @@ export default function Products() {
             <table className="table table-bordered align-middle">
               <thead className="table-light">
                 <tr>
-                  <th>Image</th>
                   <th>Name</th>
                   <th>Description</th>
                   <th>Price</th>
@@ -93,15 +111,6 @@ export default function Products() {
                 {products.length > 0 ? (
                   products.map((product) => (
                     <tr key={product.id}>
-                      <td>
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          width="80"
-                          height="80"
-                          style={{ objectFit: "cover" }}
-                        />
-                      </td>
                       <td>{product.name}</td>
                       <td>{product.description}</td>
                       <td>${product.price}</td>

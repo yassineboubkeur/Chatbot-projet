@@ -8,8 +8,8 @@ import "react-toastify/dist/ReactToastify.css";
 export default function AddProduct() {
   const navigate = useNavigate();
   const user = useAuthStore(state => state.user);
+  const token = useAuthStore(state => state.token);
 
-  // 🛡️ redirect if not logged in
   useEffect(() => {
     if (!user) {
       navigate("/login");
@@ -20,22 +20,35 @@ export default function AddProduct() {
     name: "",
     description: "",
     price: "",
-    image: null,
+    unit: "",
   });
-  const [preview, setPreview] = useState(null);
 
-  const handleAddProduct = (e) => {
+  const handleAddProduct = async (e) => {
     e.preventDefault();
-    console.log("Product to add:", newProduct);
-    toast.success("Product added successfully!");
-    navigate("/products");
-  };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setNewProduct({ ...newProduct, image: file });
-      setPreview(URL.createObjectURL(file));
+    console.log("User:", user);
+    console.log("Token:", token);
+    console.log("Product to add:", newProduct);
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/products/`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(newProduct),
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        toast.success("Product added successfully!");
+        navigate("/products");
+      } else {
+        toast.error(result.message || "Failed to add product");
+      }
+    } catch (error) {
+      toast.error("Error: " + error.message);
     }
   };
 
@@ -80,18 +93,14 @@ export default function AddProduct() {
             </div>
             <div className="mb-3">
               <input
-                type="file"
+                type="text"
                 className="form-control"
-                accept="image/*"
-                onChange={handleImageChange}
+                placeholder="Unit (e.g. kg, piece)"
+                value={newProduct.unit}
+                onChange={(e) => setNewProduct({ ...newProduct, unit: e.target.value })}
                 required
               />
             </div>
-            {preview && (
-              <div className="mb-3">
-                <img src={preview} alt="Preview" width="150" style={{ objectFit: "cover" }} />
-              </div>
-            )}
             <button className="btn btn-success" type="submit">Add Product</button>
           </form>
         </div>

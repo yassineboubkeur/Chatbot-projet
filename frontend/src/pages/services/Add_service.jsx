@@ -8,7 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 export default function AddService() {
   const navigate = useNavigate();
   const user = useAuthStore(state => state.user);
-  const token = user?.access_token; // نفترض access_token موجود في user
+  const token = useAuthStore(state => state.token); // نفترض access_token موجود في user
   const apiUrl = import.meta.env.VITE_API_URL; // رابط API من ملف env
 
   useEffect(() => {
@@ -26,6 +26,9 @@ export default function AddService() {
 
   const handleAddService = async (e) => {
   e.preventDefault();
+
+  console.log("User:", user);
+  console.log("Token:", token);
 
   console.log("Sending data:", {
     ...newService,

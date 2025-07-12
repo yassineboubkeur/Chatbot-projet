@@ -2,6 +2,137 @@ import React, { useState, useEffect } from "react";
 import Sidebar from "../../layouts/Sidebar";
 import { ToastContainer, toast } from "react-toastify";
 import { useNavigate, useParams } from "react-router-dom";
+import { useAuthStore } from "../../store/useAuthStore";
+import "react-toastify/dist/ReactToastify.css";
+
+export default function UpdateService() {
+  const navigate = useNavigate();
+  const { id } = useParams(); // غادي نجيبو ID من route مثلا /services/edit/5
+  const user = useAuthStore(state => state.user);
+  const token = useAuthStore(state => state.token);
+  const apiUrl = import.meta.env.VITE_API_URL;
+
+  const [service, setService] = useState({
+    name: "",
+    description: "",
+    price: "",
+    periode: "",
+  });
+
+  useEffect(() => {
+    if (!user) {
+      navigate("/login");
+    }
+  }, [user, navigate]);
+
+  useEffect(() => {
+    const fetchService = async () => {
+      try {
+        const response = await fetch(`${apiUrl}/services/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await response.json();
+        if (response.ok) {
+          setService({
+            name: data.data.name,
+            description: data.data.description,
+            price: data.data.price,
+            periode: data.data.periode,
+          });
+        } else {
+          toast.error(data.message || "Failed to load service");
+          navigate("/services");
+        }
+      } catch (error) {
+        toast.error("Error: " + error.message);
+      }
+    };
+
+    fetchService();
+  }, [id, apiUrl, token, navigate]);
+
+  const handleUpdateService = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch(`${apiUrl}/services/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          ...service,
+          price: Number(service.price),
+        }),
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        toast.success("Service updated successfully!");
+        navigate("/services");
+      } else {
+        toast.error(result.message || "Failed to update service");
+      }
+    } catch (error) {
+      toast.error("Error: " + error.message);
+    }
+  };
+
+  return (
+    <div className="container mt-4">
+      <ToastContainer />
+      <div className="row">
+        <div className="col-md-3">
+          <Sidebar />
+        </div>
+        <div className="col-md-9">
+          <h3 className="mb-4">Update Service</h3>
+          <form onSubmit={handleUpdateService}>
+            <input
+              type="text"
+              placeholder="Service Name"
+              value={service.name}
+              onChange={e => setService({ ...service, name: e.target.value })}
+              required
+              className="form-control mb-3"
+            />
+            <textarea
+              placeholder="Description"
+              value={service.description}
+              onChange={e => setService({ ...service, description: e.target.value })}
+              required
+              className="form-control mb-3"
+            />
+            <input
+              type="number"
+              placeholder="Price"
+              value={service.price}
+              onChange={e => setService({ ...service, price: e.target.value })}
+              required
+              className="form-control mb-3"
+            />
+            <input
+              type="text"
+              placeholder="Periode"
+              value={service.periode}
+              onChange={e => setService({ ...service, periode: e.target.value })}
+              required
+              className="form-control mb-3"
+            />
+            <button type="submit" className="btn btn-primary">Update Service</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+/*import React, { useState, useEffect } from "react";
+import Sidebar from "../../layouts/Sidebar";
+import { ToastContainer, toast } from "react-toastify";
+import { useNavigate, useParams } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function UpdateService() {
@@ -101,3 +232,4 @@ export default function UpdateService() {
     </div>
   );
 }
+*/

@@ -48,14 +48,33 @@ export default function Services() {
   }, [apiUrl, navigate, user, token]);
 
   const handleUpdate = (id) => {
-    toast.info(`Update service with id: ${id}`);
+    navigate(`/services/edit/${id}`);
     // navigate(`/services/update/${id}`);
   };
 
-  const handleDelete = (id) => {
-    setServices(services.filter(service => service.id !== id));
-    toast.success(`Service deleted successfully!`);
-  };
+  const handleDelete = async (id) => {
+  try {
+    const response = await fetch(`${apiUrl}/services/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json"
+      }
+    });
+
+    const result = await response.json();
+    if (response.ok) {
+      toast.success(result.message || "Service deleted successfully!");
+      setServices(services.filter(service => service.id !== id));
+    } else {
+      toast.error(result.message || "Failed to delete service.");
+    }
+  } catch (error) {
+    console.error("Delete service error:", error);
+    toast.error("Error deleting service. Please try again later.");
+  }
+};
+
 
   return (
     <div className="container mt-4">

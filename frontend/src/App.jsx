@@ -27,7 +27,7 @@ export default function App() {
         <Route path="/clients" element={<Clients />} /> 
         <Route path="/services" element={<Services />} />
         <Route path="/services/add" element={<AddService />} /> 
-        <Route path="/update-service" element={<UpdateService />} /> 
+        <Route path="/services/edit/:id" element={<UpdateService />} /> 
         <Route path="/products" element={<Products />} />
         <Route path="/products/add" element={<AddProduct />} /> 
         <Route path="/update-product" element={<UpdateProduct />} /> 
