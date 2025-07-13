@@ -6,25 +6,16 @@ import "react-toastify/dist/ReactToastify.css";
 
 export default function Services() {
   const navigate = useNavigate();
-  const user = useAuthStore(state => state.user);
+  
   const token = useAuthStore(state => state.token);
-  const isLoadingAuth = useAuthStore(state => state.isLoadingAuth);
-  const loadAuthFromStorage = useAuthStore(state => state.loadAuthFromStorage);
+  
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const apiUrl = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
-    loadAuthFromStorage();
-  }, [loadAuthFromStorage]);
-
-  useEffect(() => {
-    if (isLoadingAuth) return;
-
-    if (!user || !token) {
-      navigate("/login");
-      return;
-    }
+    
+    
 
     const fetchServices = async () => {
       try {
@@ -52,7 +43,7 @@ export default function Services() {
     };
 
     fetchServices();
-  }, [apiUrl, navigate, user, token, isLoadingAuth]);
+  }, [apiUrl, navigate, token]);
 
   const handleUpdate = (id) => navigate(`/services/edit/${id}`);
 
@@ -79,9 +70,7 @@ export default function Services() {
     }
   };
 
-  if (isLoadingAuth) {
-    return <div>Loading authentication...</div>;
-  }
+  
 
   return (
     <div className="container mt-4">

@@ -6,26 +6,13 @@ import "react-toastify/dist/ReactToastify.css";
 
 export default function Products() {
   const navigate = useNavigate();
-  const user = useAuthStore(state => state.user);
   const token = useAuthStore(state => state.token);
-  const isLoadingAuth = useAuthStore(state => state.isLoadingAuth);
-  const loadAuthFromStorage = useAuthStore(state => state.loadAuthFromStorage);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const apiUrl = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
-      loadAuthFromStorage();
-    }, [loadAuthFromStorage]);
-
-  useEffect(() => {
-
-    if (isLoadingAuth) return;
-
-    if (!user || !token) {
-      navigate("/login");
-      return;
-    }
+     
 
     const fetchProducts = async () => {
 
@@ -54,7 +41,7 @@ export default function Products() {
     };
 
     fetchProducts();
-  }, [apiUrl, navigate, user, token,isLoadingAuth]);
+  }, [apiUrl, navigate, token]);
 
   const handleUpdate = (id) => {
     toast.info(`Update product with id: ${id}`);
@@ -84,9 +71,7 @@ export default function Products() {
   }
 };
 
-if (isLoadingAuth) {
-    return <div>Loading authentication...</div>;
-  }
+
 
   return (
     <div className="container mt-4">

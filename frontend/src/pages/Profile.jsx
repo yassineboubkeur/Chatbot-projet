@@ -5,27 +5,12 @@ import { useAuthStore } from "../store/useAuthStore";
 
 export default function Profile() {
   const user = useAuthStore((state) => state.user);
-  const isLoadingAuth = useAuthStore((state) => state.isLoadingAuth);
-  const loadAuthFromStorage = useAuthStore((state) => state.loadAuthFromStorage);
   const navigate = useNavigate();
 
   useEffect(() => {
-    loadAuthFromStorage();
-  }, [loadAuthFromStorage]);
+    
+  }, [user, navigate]);
 
-  useEffect(() => {
-    if (!isLoadingAuth && !user) {
-      navigate("/login");
-    }
-  }, [user, isLoadingAuth, navigate]);
-
-  if (isLoadingAuth) {
-    return <p>Loading...</p>;
-  }
-
-  if (!user) {
-    return null; // أو يمكن ترجع <Navigate to="/login" replace /> 
-  }
 
   return (
     <div className="container mt-4">
