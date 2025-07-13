@@ -17,15 +17,15 @@ export default function AddService() {
     name: "",
     description: "",
     price: "",
-    periode: "", // ضروري ف API
+    periode: "", 
   });
 
-  // تحميل بيانات المصادقة عند البداية
+  
   useEffect(() => {
     loadAuthFromStorage();
   }, [loadAuthFromStorage]);
 
-  // الانتظار حتى يكتمل تحميل المصادقة ثم التحقق من وجود user و token
+  
   useEffect(() => {
     if (isLoadingAuth) return;
 
