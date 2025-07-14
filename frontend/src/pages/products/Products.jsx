@@ -32,6 +32,7 @@ export default function Products() {
 
         const data = await response.json();
         setProducts(data.data);
+        console.log(data);
       } catch (error) {
         console.error("Fetch products error:", error);
         toast.error("Error loading products. Please try again later.");

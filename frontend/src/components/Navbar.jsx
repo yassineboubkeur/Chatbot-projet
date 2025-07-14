@@ -14,7 +14,7 @@ export default function Navbar() {
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light px-4">
-      <Link className="navbar-brand" to="/">Gestion Projet</Link>
+      <Link className="navbar-brand" to="/">Gestion Ai Whatsapp</Link>
       <button
         className="navbar-toggler"
         type="button"
