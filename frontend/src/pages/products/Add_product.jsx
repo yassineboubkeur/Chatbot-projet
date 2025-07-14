@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import Sidebar from "../../layouts/Sidebar";
+import React, { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../store/useAuthStore";
@@ -7,10 +6,8 @@ import "react-toastify/dist/ReactToastify.css";
 
 export default function AddProduct() {
   const navigate = useNavigate();
-  const user = useAuthStore(state => state.user);
   const token = useAuthStore(state => state.token);
-  const isLoadingAuth = useAuthStore(state => state.isLoadingAuth);
-  const loadAuthFromStorage = useAuthStore(state => state.loadAuthFromStorage);
+   const apiUrl = import.meta.env.VITE_API_URL;
 
   const [newProduct, setNewProduct] = useState({
     name: "",
@@ -18,26 +15,12 @@ export default function AddProduct() {
     price: "",
     unit: "",
   });
-
-  // نحمّل حالة المصادقة من التخزين المحلي
-  useEffect(() => {
-    loadAuthFromStorage();
-  }, [loadAuthFromStorage]);
-
-  // ننتظر حتى تكتمل عملية تحميل المصادقة قبل التحقق
-  useEffect(() => {
-    if (isLoadingAuth) return;
-
-    if (!user || !token) {
-      navigate("/login");
-    }
-  }, [isLoadingAuth, user, token, navigate]);
-
+  
   const handleAddProduct = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/products/`, {
+      const response = await fetch(`${apiUrl}/products/`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -58,10 +41,7 @@ export default function AddProduct() {
     }
   };
 
-  // إذا كانت المصادقة تشتغل، نعرض رسالة انتظار
-  if (isLoadingAuth) {
-    return <div>Loading authentication...</div>;
-  }
+ 
 
   return (
     <div className="container mt-4">

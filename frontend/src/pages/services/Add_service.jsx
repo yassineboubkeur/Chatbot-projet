@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import Sidebar from "../../layouts/Sidebar";
+import React, { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../store/useAuthStore";
@@ -7,10 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 export default function AddService() {
   const navigate = useNavigate();
-  const user = useAuthStore(state => state.user);
   const token = useAuthStore(state => state.token);
-  const isLoadingAuth = useAuthStore(state => state.isLoadingAuth);
-  const loadAuthFromStorage = useAuthStore(state => state.loadAuthFromStorage);
   const apiUrl = import.meta.env.VITE_API_URL;
 
   const [newService, setNewService] = useState({
@@ -20,19 +16,6 @@ export default function AddService() {
     periode: "", 
   });
 
-  
-  useEffect(() => {
-    loadAuthFromStorage();
-  }, [loadAuthFromStorage]);
-
-  
-  useEffect(() => {
-    if (isLoadingAuth) return;
-
-    if (!user || !token) {
-      navigate("/login");
-    }
-  }, [isLoadingAuth, user, token, navigate]);
 
   const handleAddService = async (e) => {
     e.preventDefault();
@@ -62,10 +45,6 @@ export default function AddService() {
       toast.error("Error: " + error.message);
     }
   };
-
-  if (isLoadingAuth) {
-    return <div>Loading authentication...</div>;
-  }
 
   return (
     <div className="container mt-4">
